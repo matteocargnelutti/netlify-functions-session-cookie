@@ -29,6 +29,15 @@ npm install netlify-functions-session-cookie
 
 ## Concept and usage
 
+Automatically manages a cryptographically-signed cookie than can be used to store session data for a given user.
+
+This library was inspired by [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions) and behaves in a fairly similar way: 
+- **At function-level:** Data can be read and write from a simple, shared `session` object.
+- **Behind the scenes:** The library automatically reads and writes from the session cookie, which is cryptographically signed using HMAC-SHA256 to prevent tampering from the client. 
+
+
+### Example: Count visits of a given user
+
 ```javascript
 const { withSession } = require('netlify-functions-session-cookie');
 
@@ -50,8 +59,10 @@ async function handler(event, context, session) {
 exports.handler = withSession(handler);
 ```
 
+The `Set-Cookie` header is automatically  added to the `response` object by `withSession()` to include a serialized and signed version of the `session` object: 
 
 ```javascript
+// `response` object
 {
   statusCode: 200,
   body: '{"visits":1}',
@@ -63,6 +74,9 @@ exports.handler = withSession(handler);
 }
 ```
 
+The cookie in itself is made of **the signature and the data contained in the session obect**.
+⚠️ Data is **not encrypted, but signed**. It can be read, but not modified by the client without the secret key. 
+
 ```
 set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=Lax
 ```
@@ -73,7 +87,25 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 
 ## API
 
-### `withSession(AsyncFunction)`
+### withSession(AsyncFunction)
+Takes a [synchronous Netlify Function handler](https://docs.netlify.com/functions/build-with-javascript/#synchronous-function-format) as an argument and returns a new version of it, now with automatic session cookie management.
+
+See [Concept and usage](#concept-and-usage) for more information.
+
+```javascript
+const { withSession } = require('netlify-functions-session-cookie');
+
+// Default syntax:
+async function(event, context, session) {
+  // ...
+}
+exports.handler = withSession(handler); 
+
+// Alternative syntax:
+exports.handler = withSession(async function(event, context, session) {
+  // ...
+});
+```
 
 
 ### clearSession(Object)
@@ -90,7 +122,7 @@ const { withSession, clearSession } = require('netlify-functions-session-cookie'
 
 async function handler(event, context, session) {
 
-  clearSession(session); // Will "empty" the session object in place.
+  clearSession(session); // Will clear the session object in place.
 
   return {
     statusCode: 200,
@@ -101,8 +133,8 @@ async function handler(event, context, session) {
 exports.handler = withSession(handler);
 ```
 
-### `generateSecretKey()`
-Generates and returns a randomly-generated 32-byte-long secret key, encoded in base 64.
+### generateSecretKey()
+Generates and returns a 32-byte-long random key, encoded in base 64.
 See [_"Generating a secret key"_](#generating-a-secret-key).
 
 [☝️ Back to summary](#summary)
@@ -110,6 +142,8 @@ See [_"Generating a secret key"_](#generating-a-secret-key).
 ---
 
 ## Environment variables
+
+The session cookie can be configured through environment variables.
 
 ### Required
 | Name | Description |
