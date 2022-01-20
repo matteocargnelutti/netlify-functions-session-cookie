@@ -72,6 +72,18 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 
 ## Environment variables
 
+| Name | Required? | Description | Default |
+| --- | --- | --- | --- |
+| `SESSION_COOKIE_SECRET` | Yes | Used to sign and validate the cookie. Must be at least 32 bytes long. See [_"Generating a secret key"_](#generating-a-secret-key) | None |
+| `SESSION_COOKIE_NAME` | No | Name used by the session cookie. Must only contain ASCII-compatible characters.  | `"session"` |
+
+
+[☝️ Back to summary](#summary)
+
+---
+
+## Generating a secret key
+
 [☝️ Back to summary](#summary)
 
 ---
