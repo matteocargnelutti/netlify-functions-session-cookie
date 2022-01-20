@@ -81,7 +81,7 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 | `SESSION_COOKIE_SAMESITE` | No | Can be `"Strict"`, `"None"` or `"Lax"`. Defaults to `"Lax"` if not set. | 
 | `SESSION_COOKIE_MAX_AGE_SPAN` | No | Specifies, in second, how long the cookie should be valid for. Defaults to `604800` _(7 days)_ if not set. |
 | `SESSION_COOKIE_DOMAIN` | No | Can be used to specify a domain for the session cookie. |
-| `SESSION_COOKIE_PATH` | No | Can be used to specify a path for the session cookie. Defaults to `/`. |
+| `SESSION_COOKIE_PATH` | No | Can be used to specify a path for the session cookie. Defaults to `/` if not set. |
 
 [☝️ Back to summary](#summary)
 
