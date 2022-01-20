@@ -8,6 +8,7 @@ Inspired by [Flask's default session system](https://flask.palletsprojects.com/e
 ---
 
 ## Summary 
+- [Install](#Install)
 - [Concept and Usage](#concept-and-usage)
 - [API](#api)
 - [Environment variables](#environment-variables)
@@ -16,9 +17,21 @@ Inspired by [Flask's default session system](https://flask.palletsprojects.com/e
 
 ---
 
+## Install
+
+```bash
+npm install netlify-functions-session-cookie
+```
+
+[☝️ Back to summary](#summary)
+
+---
+
 ## Concept and usage
 
 ```javascript
+const { withSession } = require('netlify-functions-session-cookie');
+
 async function handler(event, context, session) {
 
   if ('visits' in session) {
@@ -75,7 +88,7 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 ### Required
 | Name | Description |
 | --- | --- |
-| `SESSION_COOKIE_SECRET` | Used to sign and validate the cookie. Must be at least 32 bytes long. See [_"Generating a secret key"_](#generating-a-secret-key) |
+| `SESSION_COOKIE_SECRET` | Used to sign and validate the cookie. Must be at least 32 bytes long. See [_"Generating a secret key"_](#generating-a-secret-key) for more information. |
 
 ### Optional
 | Name | Description |
@@ -93,6 +106,13 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 ---
 
 ## Generating a secret key
+
+Session cookies are signed using HMAC-SHA256, which requires a secret key of at least 32 bytes of length.
+
+You may use this one-liner to generate a random key, once :
+```bash
+node -e "console.log(require('netlify-functions-session-cookie').generateSecretKey())"
+```
 
 [☝️ Back to summary](#summary)
 
