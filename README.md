@@ -72,16 +72,21 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 
 ## Environment variables
 
-| Name | Required? | Description |
-| --- | --- | --- |
-| `SESSION_COOKIE_SECRET` | **Yes** | Used to sign and validate the cookie. Must be at least 32 bytes long. See [_"Generating a secret key"_](#generating-a-secret-key) |
-| `SESSION_COOKIE_NAME` | No | Name used by the session cookie. Must only contain ASCII-compatible characters and no whitespace. Defaults to `"session"`. |
-| `SESSION_COOKIE_HTTPONLY` | No | If set to `"0"`, the `HttpOnly` attribute of the cookie will be removed. | 
-| `SESSION_COOKIE_SECURE` | No | If set to `"0"`, the `Secure` attribute of the cookie will be skipped. |
-| `SESSION_COOKIE_SAMESITE` | No | Can be `"Strict"`, `"None"` or `"Lax"`. Defaults to `"Lax"` if not set. | 
-| `SESSION_COOKIE_MAX_AGE_SPAN` | No | Specifies, in second, how long the cookie should be valid for. Defaults to `604800` _(7 days)_ if not set. |
-| `SESSION_COOKIE_DOMAIN` | No | Can be used to specify a domain for the session cookie. |
-| `SESSION_COOKIE_PATH` | No | Can be used to specify a path for the session cookie. Defaults to `/` if not set. |
+### Required
+| Name | Description |
+| --- | --- |
+| `SESSION_COOKIE_SECRET` | Used to sign and validate the cookie. Must be at least 32 bytes long. See [_"Generating a secret key"_](#generating-a-secret-key) |
+
+### Optional
+| Name | Description |
+| --- | --- |
+| `SESSION_COOKIE_NAME` | Name used by the session cookie. Must only contain ASCII-compatible characters and no whitespace. Defaults to `"session"`. |
+| `SESSION_COOKIE_HTTPONLY` | If set to `"0"`, the `HttpOnly` attribute of the cookie will be removed. | 
+| `SESSION_COOKIE_SECURE` | If set to `"0"`, the `Secure` attribute of the cookie will be skipped. |
+| `SESSION_COOKIE_SAMESITE` | Can be `"Strict"`, `"None"` or `"Lax"`. Defaults to `"Lax"` if not set. | 
+| `SESSION_COOKIE_MAX_AGE_SPAN` | Specifies, in second, how long the cookie should be valid for. Defaults to `604800` _(7 days)_ if not set. |
+| `SESSION_COOKIE_DOMAIN` | Can be used to specify a domain for the session cookie. |
+| `SESSION_COOKIE_PATH` | Can be used to specify a path for the session cookie. Defaults to `/` if not set. |
 
 [☝️ Back to summary](#summary)
 
