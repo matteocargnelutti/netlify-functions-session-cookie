@@ -75,9 +75,35 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 
 ### `withSession(AsyncFunction)`
 
+
 ### `clearSession(Object)`
+As the `session` object is passed to the Netlify Function handler by reference, it cannot be emptied by being replaced by an empty object:
+
+```javascript
+session = {}; // This would NOT empty the actual session object.
+```
+
+You may instead use the `clearSession()` function to do so.
+
+```javascript
+const { withSession, clearSession } = require('netlify-functions-session-cookie');
+
+async function handler(event, context, session) {
+
+  clearSession(session);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Session cookie cleared." }),
+  };
+  
+}
+exports.handler = withSession(handler);
+```
 
 ### `generateSecretKey()`
+Generates and returns a randomly-generated 32-byte-long secret key, encoded in base 64.
+See [_"Generating a secret key"_](#generating-a-secret-key).
 
 [☝️ Back to summary](#summary)
 
@@ -108,8 +134,8 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 ## Generating a secret key
 
 Session cookies are signed using HMAC-SHA256, which requires a secret key of at least 32 bytes of length.
+You may use this one-liner to generate a random key, once the library is installed:
 
-You may use this one-liner to generate a random key, once :
 ```bash
 node -e "console.log(require('netlify-functions-session-cookie').generateSecretKey())"
 ```
