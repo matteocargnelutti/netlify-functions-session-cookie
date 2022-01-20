@@ -204,10 +204,10 @@ function getCookieName() {
  * Environment variables available:
  * - `env.SESSION_COOKIE_HTTPONLY`: 
  *   Specifies if the cookie should have the `HttpOnly` attribute.
- *   Set to "0" to skip this attribute.
+ *   Set to "0" to remove this attribute from the cookie definition.
  * - `env.SESSION_COOKIE_SECURE`:
  *   Specifies if the cookie should have the `Secure` attribute.
- *   Set to "0" to skip this attribute.
+ *   Set to "0" to remove this attribute from the cookie definition.
  * - `env.SESSION_COOKIE_SAMESITE`:
  *   Will specify the value for the `SameSite` attribute for the cookie.
  *   Can be "Strict", "None" or "Lax" (default).
