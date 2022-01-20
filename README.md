@@ -76,7 +76,7 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 ### `withSession(AsyncFunction)`
 
 
-### `clearSession(Object)`
+### clearSession(Object)
 As the `session` object is passed to the Netlify Function handler by reference, it cannot be emptied by being replaced by an empty object:
 
 ```javascript
@@ -90,7 +90,7 @@ const { withSession, clearSession } = require('netlify-functions-session-cookie'
 
 async function handler(event, context, session) {
 
-  clearSession(session);
+  clearSession(session); // Will "empty" the session object in place.
 
   return {
     statusCode: 200,

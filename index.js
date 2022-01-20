@@ -64,7 +64,8 @@ function clearSession(session) {
 
 /**
  * Generates a 32-byte-long random key that can be used for signing cookies using SHA-256 HMAC.
- * Inspiration: https://github.com/crypto-utils/keygrip/issues/26
+ * 
+ * Thanks to: https://github.com/crypto-utils/keygrip/issues/26
  * 
  * @returns {string} - Random series of 32 bytes encoded in base64.
  * @public
