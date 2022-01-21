@@ -3,7 +3,7 @@
 # netlify-functions-session-cookie 🍪
 Cryptographically-signed session cookies for Netlify functions.
 
-Inspired by [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions). 
+Inspired by [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions), focus on ease of use and zero-config approach. 
 
 ---
 
@@ -14,6 +14,7 @@ Inspired by [Flask's default session system](https://flask.palletsprojects.com/e
 - [Environment variables](#environment-variables)
 - [Generating a secret key](#generating-a-secret-key)
 - [Notes and disclaimers](#notes-and-disclaimers)
+- [Contributing](#contributing)
 
 ---
 
@@ -27,6 +28,8 @@ npm install netlify-functions-session-cookie
 
 ---
 
+> To rework entirely.
+
 ## Concept and usage
 
 Automatically manages a cryptographically-signed cookie than can be used to store session data for a given user.
@@ -37,9 +40,6 @@ This library was inspired by [Flask's default session system](https://flask.pall
 
 
 ### Example: Count visits of a given user
-
-> TODO: General concept
-> Explain that `session` is a reference and can't be replaced
 
 ```javascript
 const { withSession, getSession } = require('netlify-functions-session-cookie');
@@ -92,31 +92,37 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 
 ## API
 
-### withSession(AsyncFunction: handler)
+### withSession(handler: AsyncFunction)
+> TO DO: Fix now that `clearSession` expects a context object
+
 Takes a [synchronous Netlify Function handler](https://docs.netlify.com/functions/build-with-javascript/#synchronous-function-format) as an argument and returns a new version of it, now with automatic session cookie management.
 
 See [Concept and usage](#concept-and-usage) for more information.
 
 ```javascript
-const { withSession } = require('netlify-functions-session-cookie');
+const { withSession, getSession } = require('netlify-functions-session-cookie');
 
 // Default syntax:
-async function(event, context, session) {
+async function(event, context) {
+  const session = getSession(context);
   // ...
 }
 exports.handler = withSession(handler); 
 
 // Alternative syntax:
-exports.handler = withSession(async function(event, context, session) {
+exports.handler = withSession(async function(event, context) {
+  const session = getSession(context);
   // ...
 });
 ```
 
-### getSession(Object: context)
+### getSession(context: Object)
 > TO DO
+> Explain how this works (usage of `context` object).
 
-### clearSession(Object: context)
-> TO fix now that `clearSession` expects a context object
+### clearSession(context: Object)
+> TO DO: Fix now that `clearSession` expects a context object
+
 As the `session` object is passed to the Netlify Function handler by reference, it cannot be emptied by being replaced by an empty object:
 
 ```javascript
@@ -199,3 +205,7 @@ Testing and maintenance focus will remain on Netlify Functions for the time bein
 [☝️ Back to summary](#summary)
 
 ---
+
+## Contributing
+
+> TO DO
