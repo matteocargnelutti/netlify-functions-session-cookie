@@ -202,6 +202,13 @@ This library has been built for use with [Netlify Functions](https://docs.netlif
 
 Testing and maintenance focus will remain on Netlify Functions for the time being.
 
+### This is an early version
+> TO DO
+
+### The session cookie is _not_ encrypted
+> TO DO
+> Example of itsDangerous
+
 [☝️ Back to summary](#summary)
 
 ---
