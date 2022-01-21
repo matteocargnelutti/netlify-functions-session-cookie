@@ -19,16 +19,25 @@ const Keygrip = require('keygrip');
 /**
  * Name to be used for the session cookie if none provided.
  * @constant
- * @public
+ * @private
  */
 const SESSION_COOKIE_NAME_DEFAULT = 'session';
 
 /**
  * Value to be used as a default for the "Max-Age" attribute of the session cookie.
  * @constant
- * @public
+ * @private
  */
- const SESSION_COOKIE_MAX_AGE_SPAN_DEFAULT = (60 * 60 * 24 * 7);
+const SESSION_COOKIE_MAX_AGE_SPAN_DEFAULT = (60 * 60 * 24 * 7);
+
+/**
+ * Length of the signature digest, in characters. 
+ * Used to separate signature from data in the raw session cookie.
+ * 
+ * @constant
+ * @private
+ */
+const SIGNATURE_DIGEST_LENGTH = 43;
 
 //------------------------------------------------------------------------------
 // Public functions 
@@ -50,13 +59,40 @@ function withSession(handler) {
   return sessionWrapper.bind(handler);
 }
 
+
+/**
+ * Returns a reference to the `context.clientContext.sessionCookieData` object.
+ * This object contains data for the current session, which can be read and edited.
+ * 
+ * @param {Object} context - From the Lambda handler function.
+ * @returns {Object} - Reference to the session data object.
+ */
+function getSession(context) {
+  if (!context || !'clientContext' in context) {
+    throw new Error('`getSession()` requires a valid Lambda `context` object as an argument.');
+  }
+
+  let session = context.clientContext.sessionCookieData;
+
+  // Initialize `sessionCookieData` if it doesn't exist.
+  if (session === undefined || session === null) {
+    context.clientContext.sessionCookieData = {};
+    session = context.clientContext.sessionCookieData;
+  }
+
+  return session;
+}
+
 /**
  * Utility to help clear out a session object in place from the handler.
  * 
- * @param {Object} session - session object passed from the handler.
+ * @param {Object} context - From the Lambda handler function.
  * @public 
  */
-function clearSession(session) {
+function clearSession(context) {
+
+  const session = getSession(context);
+
   for (const key in session) {
     delete session[key];
   }
@@ -74,16 +110,17 @@ function generateSecretKey() {
   return crypto.randomBytes(32).toString('base64');
 }
 
+
 //------------------------------------------------------------------------------
 // Local functions 
 //------------------------------------------------------------------------------
 /**
  * Main wrapper around the lambda handler function.
  * Automatically manages a cryptographically signed session cookie, in an out. 
- * Gives access to a `session` object that can be used within the handler to manage session data.
+ * Gives access to a `session` object, which can be used to access and edit session data.
  * 
- * @param {Object} event - From the `handler` function.
- * @param {Object} context - From the `handler` function.
+ * @param {Object} event - From the Lambda handler function.
+ * @param {Object} context - From the Lambda handler function.
  * @this {function} - Lambda function handler. Bound via `withSession`.
  * @returns {Object} - Altered `response` received from `handler`.
  * @private
@@ -93,8 +130,9 @@ async function sessionWrapper(event, context) {
   const secretKey = new Keygrip([getSecretKey()], 'sha256', 'base64');
 
   let incomingCookies = null;
-  let session = {}; // Holds the current state of session data.
   let response = null;
+
+  const session = getSession(context); // Holds the current state of session data.
 
   //
   // [1] Try to validate and parse current session data from the `Cookie` header.
@@ -116,17 +154,20 @@ async function sessionWrapper(event, context) {
   // Grab, validate and parse session data from cookie
   if (incomingCookies && incomingCookies[cookieName]) {
 
-    // Signature: 43 first characters, stays in base64.
+    // Signature: first X characters (`SIGNATURE_DIGEST_LENGTH`), stays in base64.
     // Note: Only works because we know that all characters used for signatures are 1 byte long.
-    let signature = incomingCookies[cookieName].substring(0, 43);
+    let signature = incomingCookies[cookieName].substring(0, SIGNATURE_DIGEST_LENGTH);
 
     // Data: everything after the signature. Needs to be decoded from base64.
-    let data = incomingCookies[cookieName].substring(43);
+    let data = incomingCookies[cookieName].substring(SIGNATURE_DIGEST_LENGTH);
     data = Buffer.from(data, 'base64').toString('utf-8');
 
-    // If signature matches, parse data from JSON and put into the `session` object.
+    // If signature matches, parse data from JSON and put into the `clientContext.session` object.
     if (secretKey.verify(data, signature)) {
-      session = JSON.parse(data);
+      data = JSON.parse(data);
+      for (let [key, value] of Object.entries(data)) { // Update in place to preserve `session` ref.
+        session[key] = value
+      }
     }
 
   }
@@ -134,7 +175,7 @@ async function sessionWrapper(event, context) {
   //
   // [2] Give access to session data to the handler as it runs.
   //
-  response = await this(event, context, session);
+  response = await this(event, context);
 
   //
   // [3] Process response out of the handler to automatically append session data as a signed cookie.
@@ -309,6 +350,7 @@ function getSecretKey() {
 //------------------------------------------------------------------------------
 module.exports = {
   withSession,
+  getSession,
   clearSession,
   generateSecretKey
 }

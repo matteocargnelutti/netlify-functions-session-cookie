@@ -9,14 +9,16 @@
 // Imports
 //------------------------------------------------------------------------------
 const rewire = require("rewire");
-const lib = rewire('./index.js');
 
+const lib = rewire('./index.js');
 const withSession = lib.__get__('withSession');
+const getSession = lib.__get__('getSession');
 const clearSession = lib.__get__('clearSession');
 const generateSecretKey = lib.__get__('generateSecretKey');
 const getCookieName = lib.__get__('getCookieName');
 const getCookieOptions = lib.__get__('getCookieOptions');
 const getSecretKey = lib.__get__('getSecretKey');
+const SIGNATURE_DIGEST_LENGTH = lib.__get__('SIGNATURE_DIGEST_LENGTH');
 const SESSION_COOKIE_NAME_DEFAULT = lib.__get__('SESSION_COOKIE_NAME_DEFAULT');
 const SESSION_COOKIE_MAX_AGE_SPAN_DEFAULT = lib.__get__('SESSION_COOKIE_MAX_AGE_SPAN_DEFAULT');
 
@@ -80,31 +82,58 @@ describe('Test suite for the `withSession()` function:', () => {
       handlerRan: false
     }
 
-    async function handler(event, context, session) {
+    async function handler(event, context) {
       flags.handlerRan = true;
       return {};
     }
 
+    const event = {};
+    const context = { clientContext: {}};
+
     process.env.SESSION_COOKIE_SECRET = SESSION_COOKIE_SECRET.valid;
 
-    await withSession(handler)({}, {}); // "normal" handler expects two params: event and context.
+    await withSession(handler)(event, context);
 
     expect(flags.handlerRan).toBe(true);
   });
 
 });
 
+describe('Test suite for the `getSession()` function:', () => {
+
+  test('Throws unless given a suitable `context` object as an argument.', () => {
+    for (let value of [{}, "", [], 12, {foo: 12}]) {
+      expect(() => getSession(value)).toThrow();
+    }
+  });
+
+  test('Creates `context.clientContext.sessionCookieData` if needed.', () => {
+    const context = {clientContext: {}};
+    getSession(context);
+    expect('sessionCookieData' in context.clientContext).toBe(true);
+  });
+
+  test('Returns a reference to `context.clientContext.sessionCookieData`.', () => {
+    const context = {clientContext: {}};
+    const session = getSession(context);
+    expect(session === context.clientContext.sessionCookieData).toBe(true);
+  });
+
+});
 
 describe('Test suite for the `clearSession()` function:', () => {
 
-  test('Empties a given object.', () => {
-    let session = {
-      'foo': 'bar', 
-      'lorem': 'ipsum'
-    };
+  test('Empties `context.clientContext.sessionCookieData`.', () => {
 
-    clearSession(session);
-    
+    // Initialize a `context.clientContext.sessionCookieData` object.
+    const context = {clientContext: {}};
+
+    const session = getSession(context);
+    session.foo = 'bar';
+    session.lorem = 'ipsum';
+
+    // Check that it clears.
+    clearSession(context);
     expect(Object.keys(session).length).toBe(0);
   });
 
@@ -143,8 +172,17 @@ describe('Test suite for the `sessionWrapper()` function:', () => {
     lorem: 'ipsum'
   };
 
-  // Mock of a lambda function handler, simulating use of the `session` object.
-  async function handler(event, context, session) {
+  // Event and context to be passed to the handler function
+  const event = {};
+  
+  const context = {
+    clientContext: {}
+  };
+
+  // Mock of a lambda function handler, simulating read / write of session data.
+  async function handler(event, context) {
+
+    const session = getSession(context);
 
     // Check that `session` object exists
     if (session !== null && session !== undefined) {
@@ -180,10 +218,7 @@ describe('Test suite for the `sessionWrapper()` function:', () => {
   }
 
   test('Runs complete session lifecycle (read, write, signature validation).', async() => {
-    const event = {};
-    const context = {};
     let response = null;
-
     let validCookie = null;
     let alteredCookie = null;
 
@@ -191,9 +226,9 @@ describe('Test suite for the `sessionWrapper()` function:', () => {
 
     //
     // [1] First run: 
-    // - Check that `handler` function is given a session object.
-    // - Check that a `session` cookie is being returned in response.
-    // - Ensure that the `session` cookie didn't erase any other `Set-Cookie` header. 
+    // - Check that the handler function has access to session data.
+    // - Check that a session cookie is being returned in response.
+    // - Ensure that the session cookie didn't erase any other `Set-Cookie` header. 
     //
     response = await withSession(handler)(event, context);
     expect(flags.handlerIsGivenSessionObject).toBe(true);
@@ -209,7 +244,7 @@ describe('Test suite for the `sessionWrapper()` function:', () => {
     // [2] Second run:
     // - Check that `handler` writes and parses the session cookie correctly.
     //
-    // Grab `session` cookie from last response.
+    // Grab session cookie from last response.
     validCookie = response.multiValueHeaders['Set-Cookie'][2];
     validCookie = validCookie.split(';')[0];
     event.multiValueHeaders = { 'Cookie': [validCookie] };
@@ -221,11 +256,13 @@ describe('Test suite for the `sessionWrapper()` function:', () => {
     // [3] Third run:
     // - Ensure that session cookie is not parsed if it was tampered with.
     //
-    alteredCookie = event.multiValueHeaders['Cookie'][0].substring(0, 43); // Signature
+    alteredCookie = event.multiValueHeaders['Cookie'][0].substring(0, SIGNATURE_DIGEST_LENGTH); // Signature
     alteredCookie += encodeURIComponent(Buffer.from('"oh noes"').toString('base64')); // New payload
     event.multiValueHeaders['Cookie'][0] = alteredCookie;
 
+    clearSession(context);
     flags.sessionCookieIsParsed = false;
+
     response = await withSession(handler)(event, context);
     expect(flags.sessionCookieIsParsed).toBe(false);
 
@@ -236,7 +273,9 @@ describe('Test suite for the `sessionWrapper()` function:', () => {
     event.multiValueHeaders['Cookie'][0] = validCookie;
     process.env.SESSION_COOKIE_SECRET = generateSecretKey();
 
+    clearSession(context);
     flags.sessionCookieIsParsed = false;
+
     response = await withSession(handler)(event, context);
     expect(flags.sessionCookieIsParsed).toBe(false);
 

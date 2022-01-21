@@ -32,16 +32,21 @@ npm install netlify-functions-session-cookie
 Automatically manages a cryptographically-signed cookie than can be used to store session data for a given user.
 
 This library was inspired by [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions) and behaves in a fairly similar way: 
-- **At function-level:** Data can be read and write from a simple, shared `session` object.
+- **At function-level:** Data can be read and write from a simple, shared session data object.
 - **Behind the scenes:** The library automatically reads and writes from the session cookie, which is cryptographically signed using HMAC-SHA256 to prevent tampering from the client. 
 
 
 ### Example: Count visits of a given user
 
-```javascript
-const { withSession } = require('netlify-functions-session-cookie');
+> TODO: General concept
+> Explain that `session` is a reference and can't be replaced
 
-async function handler(event, context, session) {
+```javascript
+const { withSession, getSession } = require('netlify-functions-session-cookie');
+
+async function handler(event, context) {
+
+  const session = getSession(context);
 
   if ('visits' in session) {
     session.visits += 1;
@@ -87,7 +92,7 @@ set-cookie: session=b-v3l87SbkttQWjbVgOusC9uesdVsRvWVqEcSuNkZBkeyJ2aXNpdHMiOjF9;
 
 ## API
 
-### withSession(AsyncFunction)
+### withSession(AsyncFunction: handler)
 Takes a [synchronous Netlify Function handler](https://docs.netlify.com/functions/build-with-javascript/#synchronous-function-format) as an argument and returns a new version of it, now with automatic session cookie management.
 
 See [Concept and usage](#concept-and-usage) for more information.
@@ -107,8 +112,11 @@ exports.handler = withSession(async function(event, context, session) {
 });
 ```
 
+### getSession(Object: context)
+> TO DO
 
-### clearSession(Object)
+### clearSession(Object: context)
+> TO fix now that `clearSession` expects a context object
 As the `session` object is passed to the Netlify Function handler by reference, it cannot be emptied by being replaced by an empty object:
 
 ```javascript
