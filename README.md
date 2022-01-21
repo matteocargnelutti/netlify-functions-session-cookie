@@ -3,7 +3,7 @@
 # netlify-functions-session-cookie 🍪
 Cryptographically-signed session cookies for Netlify functions.
 
-Inspired by [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions), focus on ease of use and zero-config approach. 
+Inspired by [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions), with a focus on ease of use and a zero-config approach. 
 
 ---
 
