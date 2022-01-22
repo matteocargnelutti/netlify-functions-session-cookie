@@ -1,5 +1,3 @@
-> Work in progress 🚧
-
 # netlify-functions-session-cookie 🍪
 Cryptographically-signed session cookies for [Netlify functions](https://docs.netlify.com/functions/overview/).
 
@@ -11,7 +9,7 @@ Cryptographically-signed session cookies for [Netlify functions](https://docs.ne
 - [API](#api)
 - [Environment variables and options](#environment-variables-and-options)
 - [Generating a secret key](#generating-a-secret-key)
-- [Notes and disclaimers](#notes-and-disclaimers)
+- [Notes and misc](#notes-and-misc)
 - [Contributing](#contributing)
 
 ---
@@ -33,10 +31,10 @@ See [_"Generating a secret key"_](#generating-a-secret-key).
 This library automatically manages a cryptographically-signed cookie that can be used to store data for a given client. 
 
 **It takes inspiration from [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions) and behaves in a similar way:** 
-- **At handler level:** it gives access to a standard object which can be used to read and write data to and from the session cookie for the current client.
+- **At handler level:** gives access to a standard object which can be used to read and write data to and from the session cookie for the current client.
 - **Behind the scenes:** the session cookie is automatically validated and parsed on the way in, signed and serialized on the way out. 
 
-Simply wrap a function handler with `withSession()` to get started. 
+Simply wrap a Netlify Function handler with `withSession()` to get started. 
 
 ### Example: count visits of a given client
 ```javascript
@@ -91,11 +89,9 @@ Takes a [synchronous Netlify Function handler](https://docs.netlify.com/function
 See [_"Concept and Usage"_](#concept-and-usage) for more information.
 
 ```javascript
-const { withSession, getSession } = require('netlify-functions-session-cookie');
+const { withSession } = require('netlify-functions-session-cookie');
 
 exports.handler = withSession(async function(event, context) {
-  const session = getSession(context);
-  // `session` can now be used to read and write data from the session cookie.
   // ...
 });
 
@@ -113,8 +109,11 @@ exports.handler = withSession(handler);
 If `context.clientContext.sessionCookieData` doesn't exist, it is going to be created on the fly.
 
 ```javascript
+const { withSession } = require('netlify-functions-session-cookie');
+
 exports.handler = withSession(async function(event, context) {
-  const session = getSession(context);
+  const session = getSession(context); 
+  // `session` can now be used to read and write data from the session cookie.
   // ...
 });
 ```
@@ -150,7 +149,7 @@ exports.handler = withSession(handler);
 ```
 
 ### generateSecretKey()
-Generates and returns a 32-byte-long random key, encoded in base 64.
+Generates and returns a 32-byte-long random key, encoded in base64.
 See [_"Generating a secret key"_](#generating-a-secret-key).
 
 [☝️ Back to summary](#summary)
@@ -196,7 +195,7 @@ Use the [`SESSION_COOKIE_SECRET` environment variable](#environment-variables-an
 
 ---
 
-## Notes and disclaimers
+## Notes and misc
 
 ### Not affiliated with Netlify
 This open-source project is not affiliated with [Netlify](https://www.netlify.com/).
@@ -206,14 +205,12 @@ This library has been built for use with [Netlify Functions](https://docs.netlif
 
 Testing and maintenance focus will remain on Netlify Functions for the time being.
 
-### The session cookie is _not_ encrypted
-Please always remember that, while the session cookie is signed and serialized, it is *not* encrypted, and shouldn't be used to store information that shouldn't live on the client-side. 
-
 [☝️ Back to summary](#summary)
 
 ---
 
 ## Contributing
+
 > Work in progress 🚧. 
 > **In the meantime:** Please feel free to open [issues](https://github.com/matteocargnelutti/netlify-functions-session-cookie/issues) to report bugs, suggest features, or offer to contribute to this project.
 

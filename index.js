@@ -117,6 +117,11 @@ function generateSecretKey() {
  * Automatically manages a cryptographically signed session cookie, in an out. 
  * Gives access to a `session` object, which can be used to access and edit session data.
  * 
+ * Cookie data format:
+ * - Part 1: HMAC SHA256 digest of JSON string, base64.
+ * - Part 2: JSON string that was signed, base64.
+ * - See `SIGNATURE_DIGEST_LENGTH` to determine split between the two parts.
+ * 
  * @param {Object} event - From the Lambda handler function.
  * @param {Object} context - From the Lambda handler function.
  * @this {function} - Lambda function handler. Bound via `withSession`.
@@ -156,7 +161,7 @@ async function sessionWrapper(event, context) {
     // Note: Only works because we know that all characters used for signatures are 1 byte long.
     let signature = incomingCookies[cookieName].substring(0, SIGNATURE_DIGEST_LENGTH);
 
-    // Data: everything after the signature. Needs to be decoded from base64.
+    // Data: everything after the signature. Needs to be decoded from base64, parsed from JSON.
     let data = incomingCookies[cookieName].substring(SIGNATURE_DIGEST_LENGTH);
     data = Buffer.from(data, 'base64').toString('utf-8');
 
@@ -195,6 +200,7 @@ async function sessionWrapper(event, context) {
   }
 
   // Sign session data and add it to `Set-Cookie`.
+  // Reminder: session cookie = signature + data that was signed
   let sessionAsJSON = JSON.stringify(session);
   let cookieValue = secretKey.sign(sessionAsJSON) + Buffer.from(sessionAsJSON).toString('base64'); // session=[signature][data]
 
