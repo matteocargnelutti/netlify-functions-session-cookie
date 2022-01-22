@@ -104,7 +104,7 @@ exports.handler = withSession(handler);
 ```
 
 ### getSession(context: Object)
-`getSession()` takes a `context` object from the function handler as an argument a returns a reference to `context.clientContext.sessionCookieData`, which is where parsed session data live.
+`getSession()` takes a `context` object from a Netlify Function handler as an argument a returns a reference to `context.clientContext.sessionCookieData`, which is where parsed session data live.
 
 If `context.clientContext.sessionCookieData` doesn't exist, it is going to be created on the fly.
 
@@ -119,7 +119,7 @@ exports.handler = withSession(async function(event, context) {
 ```
 
 ### clearSession(context: Object)
-As the session object is passed to the Netlify Function handler by reference, it is not possible to clear it all at once by simply replacing it by an empty object:
+As the session object is passed to the Netlify Functions handler by reference, it is not possible to clear it all at once by simply replacing it by an empty object:
 
 ```javascript
 exports.handler = withSession(async function(event, context) {
@@ -129,7 +129,7 @@ exports.handler = withSession(async function(event, context) {
 }
 ```
 
-You may instead use the `clearSession()` function to do so. This function takes a `context` object as an argument.
+You may instead use the `clearSession()` function to do so. This function takes the Netlify Functions handler `context` object as an argument.
 
 ```javascript
 const { withSession, getSession, clearSession } = require('netlify-functions-session-cookie');
