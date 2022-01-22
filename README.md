@@ -122,7 +122,7 @@ exports.handler = withSession(async function(event, context) {
 As the session object is passed to the Netlify Function handler by reference, it is not possible to clear it all at once by simply replacing it by an empty object:
 
 ```javascript
-async function(event, context) {
+exports.handler = withSession(async function(event, context) {
   let session = getSession(context);
   session = {}; // This will NOT clear session data.
   // ...
