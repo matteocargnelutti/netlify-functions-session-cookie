@@ -1,0 +1,32 @@
+{
+  "name": "netlify-functions-session-cookie",
+  "version": "0.1.0",
+  "description": "Cryptographically-signed session cookies for Netlify Functions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matteocargnelutti/netlify-functions-session-cookie.git"
+  },
+  "keywords": [
+    "netlify",
+    "netlify-functions",
+    "serverless"
+  ],
+  "author": "Matteo Cargnelutti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matteocargnelutti/netlify-functions-session-cookie/issues"
+  },
+  "homepage": "https://github.com/matteocargnelutti/netlify-functions-session-cookie#readme",
+  "dependencies": {
+    "cookie": "^0.4.1",
+    "keygrip": "^1.1.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.7",
+    "rewire": "^6.0.0"
+  }
+}
