@@ -20,7 +20,7 @@ Cryptographically-signed session cookies for [Netlify functions](https://docs.ne
 npm install netlify-functions-session-cookie
 ```
 
-⚠️ This library needs a **secret key** to sign and validate cookies. 
+⚠️ This library requires a **secret key** to sign and verify cookies. 
 See [_"Generating a secret key"_](#generating-a-secret-key).
 
 [☝️ Back to summary](#summary)
@@ -28,15 +28,15 @@ See [_"Generating a secret key"_](#generating-a-secret-key).
 ---
 
 ## Concept and usage
-This library automatically manages a cryptographically-signed cookie that can be used to store data for a given client. 
+This library automatically manages a cryptographically-signed cookie that can be used to store data for a given client across requests.  Signed cookies are an efficient way of storing data on the client side while preventing tampering. 
 
 **It takes inspiration from [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions) and behaves in a similar way:** 
 - **At handler level:** gives access to a standard object which can be used to read and write data to and from the session cookie for the current client.
-- **Behind the scenes:** the session cookie is automatically validated and parsed on the way in, signed and serialized on the way out. 
+- **Behind the scenes:** the session cookie is automatically verified and parsed on the way in, signed and serialized on the way out.
 
 Simply wrap a Netlify Function handler with `withSession()` to get started. 
 
-### Example: count visits of a given client
+### Example: visits counter for a given user
 ```javascript
 const { withSession, getSession } = require('netlify-functions-session-cookie');
 
@@ -59,7 +59,7 @@ exports.handler = withSession(async function(event, context) {
 });
 ```
 
-The `Set-Cookie` header is automatically added to the response object to include a serialized and signed version of the session object: 
+The `Set-Cookie` header is automatically added to the response object to include a serialized and signed version of the session object:
 
 ```javascript
 // `response` object
@@ -73,6 +73,8 @@ The `Set-Cookie` header is automatically added to the response object to include
   }
 }
 ```
+
+> **Note:** Existing `Set-Cookie` entries in `response.headers` or `response.multiValueHeaders` are preserved and merged into `response.multiValueHeaders`. 
 
 The cookie's attributes can be configured individually using [environment variables](#environment-variables-and-options).
 
@@ -119,7 +121,7 @@ exports.handler = withSession(async function(event, context) {
 ```
 
 ### clearSession(context: Object)
-As the session object is passed to the Netlify Functions handler by reference, it is not possible to clear it all at once by simply replacing it by an empty object:
+As the session object is passed to the Netlify Functions handler by reference, it is not possible to empty by simply replacing it by an new object:
 
 ```javascript
 exports.handler = withSession(async function(event, context) {
@@ -182,7 +184,7 @@ The session cookie can be configured through environment variables.
 
 ## Generating a secret key
 
-Session cookies are signed using HMAC SHA256, which requires using a secret key of at least 32 bytes of length.
+Session cookies are signed using [HMAC SHA256](https://en.wikipedia.org/wiki/HMAC), which requires using a secret key of at least 32 bytes of length.
 This one-liner can be used to generate a random key, once the library is installed:
 
 ```bash
@@ -202,8 +204,6 @@ This open-source project is not affiliated with [Netlify](https://www.netlify.co
 
 ### Usage with other AWS Lambda setups
 This library has been built for use with [Netlify Functions](https://docs.netlify.com/functions/build-with-javascript/), but could in theory work with other setups using AWS Lambda functions. 
-
-Testing and maintenance focus will remain on Netlify Functions for the time being.
 
 [☝️ Back to summary](#summary)
 
