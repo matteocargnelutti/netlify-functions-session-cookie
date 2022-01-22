@@ -39,7 +39,7 @@ Simply wrap a Netlify Function handler with `withSession()` to get started.
 
 ### Example: assigning an identifier to a client.
 ```javascript
-const { withSession, getSession } = require('../index.js');
+const { withSession, getSession } = require('netlify-functions-session-cookie');
 const crypto = require('crypto');
 
 exports.handler = withSession(async function(event, context) {
@@ -98,7 +98,7 @@ exports.handler = withSession(async function(event, context) {
 });
 
 // Alternatively: 
-async function(event, context) {
+async function handler(event, context) {
   // ...
 }
 exports.handler = withSession(handler); 
