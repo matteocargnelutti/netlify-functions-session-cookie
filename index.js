@@ -59,7 +59,6 @@ function withSession(handler) {
   return sessionWrapper.bind(handler);
 }
 
-
 /**
  * Returns a reference to the `context.clientContext.sessionCookieData` object.
  * This object contains data for the current session, which can be read and edited.
@@ -109,7 +108,6 @@ function clearSession(context) {
 function generateSecretKey() {
   return crypto.randomBytes(32).toString('base64');
 }
-
 
 //------------------------------------------------------------------------------
 // Local functions 
