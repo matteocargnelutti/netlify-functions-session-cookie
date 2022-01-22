@@ -203,9 +203,7 @@ Use the [`SESSION_COOKIE_SECRET` environment variable](#environment-variables-an
 This open-source project is not affiliated with [Netlify](https://www.netlify.com/).
 
 ### Usage with other AWS Lambda setups
-This library has been built for use with [Netlify Functions](https://docs.netlify.com/functions/build-with-javascript/), but could in theory work with other setups using AWS Lambda functions, depending on how it is configured.
-
-At this stage of the project, the focus remains on Netlify Functions.
+This library has been built for use with [Netlify Functions](https://docs.netlify.com/functions/build-with-javascript/), but could in theory work with other setups using AWS Lambda functions, depending on configuration specifics. 
 
 [☝️ Back to summary](#summary)
 
