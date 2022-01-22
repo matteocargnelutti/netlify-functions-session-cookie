@@ -67,7 +67,7 @@ function withSession(handler) {
  * @returns {Object} - Reference to the session data object.
  */
 function getSession(context) {
-  if (!context || !'clientContext' in context) {
+  if (!context || !('clientContext' in context)) {
     throw new Error('`getSession()` requires a valid Lambda `context` object as an argument.');
   }
 

@@ -28,32 +28,32 @@ See [_"Generating a secret key"_](#generating-a-secret-key).
 ---
 
 ## Concept and usage
-This library automatically manages a cryptographically-signed cookie that can be used to store data for a given client across requests.  Signed cookies are an efficient way of storing data on the client side while preventing tampering. 
+This library automatically manages a cryptographically-signed cookie that can be used to store data for a given client. 
+Signed cookies are harder to tamper with and can therefore be used to store non-sensitive data on the client side. 
 
 **It takes inspiration from [Flask's default session system](https://flask.palletsprojects.com/en/2.0.x/quickstart/#sessions) and behaves in a similar way:** 
 - **At handler level:** gives access to a standard object which can be used to read and write data to and from the session cookie for the current client.
-- **Behind the scenes:** the session cookie is automatically verified and parsed on the way in, signed and serialized on the way out.
+- **Behind the scenes:** the session cookie is automatically verified and parsed on the way in, signed and serialized on the way out. 
 
 Simply wrap a Netlify Function handler with `withSession()` to get started. 
 
-### Example: visits counter for a given user
+### Example: assigning an identifier to a client.
 ```javascript
-const { withSession, getSession } = require('netlify-functions-session-cookie');
+const { withSession, getSession } = require('../index.js');
+const crypto = require('crypto');
 
 exports.handler = withSession(async function(event, context) {
 
   const session = getSession(context);
 
-  if ('visits' in session) {
-    session.visits += 1;
-  }
-  else {
-    session.visits = 1;
+  // `session.identifier` will already exist the next time this client sends a request.
+  if (!session.identifier) {
+    session.identifier = crypto.randomBytes(16).toString('hex');
   }
 
   return {
     statusCode: 200,
-    body: `You've visited this endpoint ${session.visits} time(s)`
+    body: `Your identifier is ${session.identifier}`
   }
   
 });
@@ -65,10 +65,10 @@ The `Set-Cookie` header is automatically added to the response object to include
 // `response` object
 {
   statusCode: 200,
-  body: "You've visited this endpoint 11 time(s)",
+  body: 'Your identifier is 167147eb57500c660bce192a0debeb58',
   multiValueHeaders: {
     'Set-Cookie': [
-      'session=6tHCcUCghDUKwOMU3ZNWRYTaQZfde-dxgoDkLpjG26QeyJ2aXNpdHMiOjExfQ%3D%3D; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=Lax'
+      'session=E58l2HhxWQycgAedPvt2g-hfr96j06tLJ0f4t0KRuOseyJpZGVudGlmaWVyIjoiMTY3MTQ3ZWI1NzUwMGM2NjBiY2UxOTJhMGRlYmViNTgifQ%3D%3D; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=Lax'
     ]
   }
 }
@@ -203,7 +203,9 @@ Use the [`SESSION_COOKIE_SECRET` environment variable](#environment-variables-an
 This open-source project is not affiliated with [Netlify](https://www.netlify.com/).
 
 ### Usage with other AWS Lambda setups
-This library has been built for use with [Netlify Functions](https://docs.netlify.com/functions/build-with-javascript/), but could in theory work with other setups using AWS Lambda functions. 
+This library has been built for use with [Netlify Functions](https://docs.netlify.com/functions/build-with-javascript/), but could in theory work with other setups using AWS Lambda functions, depending on how it is configured.
+
+At this stage of the project, the focus remains on Netlify Functions.
 
 [☝️ Back to summary](#summary)
 
