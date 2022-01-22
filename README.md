@@ -214,6 +214,7 @@ At this stage of the project, the focus remains on Netlify Functions.
 ## Contributing
 
 > Work in progress 🚧. 
+>
 > **In the meantime:** Please feel free to open [issues](https://github.com/matteocargnelutti/netlify-functions-session-cookie/issues) to report bugs, suggest features, or offer to contribute to this project.
 
 [☝️ Back to summary](#summary)
