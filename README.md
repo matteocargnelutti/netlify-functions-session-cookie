@@ -138,8 +138,7 @@ const { withSession, getSession, clearSession } = require('netlify-functions-ses
 
 async function handler(event, context) {
 
-  const session = getSession(session);
-  clearSession(session); // Will clear the session object in place.
+  clearSession(context); // Will clear the session object in place.
 
   return {
     statusCode: 200,
