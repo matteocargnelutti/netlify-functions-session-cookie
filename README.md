@@ -1,6 +1,9 @@
 # netlify-functions-session-cookie 🍪
 Cryptographically-signed session cookies for [Netlify functions](https://docs.netlify.com/functions/overview/).
 
+
+[![npm version](https://badge.fury.io/js/netlify-functions-session-cookie.svg)](https://badge.fury.io/js/netlify-functions-session-cookie)
+
 ---
 
 ## Summary 
