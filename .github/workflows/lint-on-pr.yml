@@ -1,0 +1,26 @@
+name: Run linter on PR to main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [18, 20]
+
+    name: Node.js ${{ matrix.node }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node }}
+    - run: npm install
+    - run: npm run lint
