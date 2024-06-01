@@ -89,7 +89,7 @@ The cookie's attributes can be configured individually using [environment variab
 ## API
 
 ### withSession(handler: AsyncFunction)
-Takes a [synchronous Netlify Function handler](https://docs.netlify.com/functions/build-with-javascript/#synchronous-function-format) as an argument and returns it wrapped with [`sessionWrapper()`](https://github.com/matteocargnelutti/netlify-functions-session-cookie/blob/main/index.js#:~:text=function%20sessionWrapper), which handles the session cookie in and out. 
+Takes an [asynchronous Netlify Function handler](https://docs.netlify.com/functions/build-with-javascript/#synchronous-function-format) as an argument and returns it wrapped with [`sessionWrapper()`](https://github.com/matteocargnelutti/netlify-functions-session-cookie/blob/main/index.js#:~:text=function%20sessionWrapper), which handles the session cookie in and out. 
 
 See [_"Concept and Usage"_](#concept-and-usage) for more information.
 
