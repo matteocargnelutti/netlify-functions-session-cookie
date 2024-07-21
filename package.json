@@ -1,6 +1,6 @@
 {
   "name": "netlify-functions-session-cookie",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Cryptographically-signed session cookies for Netlify Functions.",
   "main": "index.js",
   "scripts": {
